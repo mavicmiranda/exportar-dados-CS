@@ -1,15 +1,28 @@
+import os
 import requests
+from dotenv import load_dotenv
 import pandas as pd
 from tkinter.filedialog import asksaveasfilename
 import customtkinter as ctk
+from PIL import Image
+import os
+from dotenv import load_dotenv
+
+# Agora você pode acessar as variáveis de ambiente
+url_health = os.getenv("URL_HEALTH")
+url = os.getenv("WEBHOOK_URL")
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
 
 def processar_consulta():
     inicio = entrada_inicio.get()
     fim = entrada_fim.get()
     tipo_consulta = opcao_tipo.get()
-    
-    url_health = 'https://queue-ms-3000.zapisp.com.br/health'
+
+    # Usando as URLs carregadas das variáveis de ambiente
+    url_health = os.getenv("URL_HEALTH")
+    url = os.getenv("WEBHOOK_URL")
     
     try:
         response_health = requests.get(url_health, headers={'accept': 'application/json'})
@@ -36,7 +49,7 @@ def processar_consulta():
         'tipo_consulta': tipo_consulta
     }
 
-    url = 'https://n8n.zapisp.com.br/webhook/338bf7f8-75f1-48da-915c-39c21ddb1d9b'
+    url = os.getenv("WEBHOOK_URL")
 
     try:
         response = requests.get(url, params=params)
@@ -62,14 +75,12 @@ def processar_consulta():
 
     if all(isinstance(item, dict) for item in dados):
         try:
-            # Abrir a janela para salvar o arquivo
             arquivo = asksaveasfilename(
-                defaultextension=".csv",  # Extensão padrão
-                filetypes=[("CSV files", "*.csv")],  # Tipos de arquivos permitidos
-                initialfile="dados_consulta.csv",  # Nome padrão
-                title="Salvar arquivo como"  # Título da janela
+                defaultextension=".csv",
+                filetypes=[("CSV files", "*.csv")],
+                initialfile="dados_consulta.csv",
+                title="Salvar arquivo como"
             )
-            # Verificar se o usuário selecionou um arquivo
             if arquivo:
                 df = pd.DataFrame(dados)
                 df.to_csv(arquivo, index=False)
@@ -85,44 +96,49 @@ def processar_consulta():
         print(f"Erro ao processar os dados.")
         resultado_label.configure(text="Erro ao processar os dados.", text_color="red")
 
-
 # Configurações da janela principal
-ctk.set_appearance_mode("dark")  # Modos: "dark" ou "light"
-ctk.set_default_color_theme("blue")  # Tema: "blue", "green", "dark-blue"
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
 
 janela = ctk.CTk()
 janela.title("Exportar Dados")
-janela.geometry("400x350")
+janela.geometry("400x600")
 
-# Componentes da interface
-titulo_label = ctk.CTkLabel(janela, text="Exportar Dados", font=("Arial", 18))
-titulo_label.pack(pady=10)
+# Exibir a imagem acima do título
+imagem = ctk.CTkImage(light_image=Image.open("logo.png"), size=(200, 100))
+imagem_label = ctk.CTkLabel(janela, image=imagem, text="")
+imagem_label.pack(pady=10, fill="x")
 
-inicio_label = ctk.CTkLabel(janela, text="Data de Início:")
-inicio_label.pack()
-entrada_inicio = ctk.CTkEntry(janela, placeholder_text="AAAA-MM-DD")
-entrada_inicio.pack()
+# Frame para inputs
+frame_inputs = ctk.CTkFrame(janela)
+frame_inputs.pack(fill="both", expand=True, padx=20, pady=10)
 
-fim_label = ctk.CTkLabel(janela, text="Data de Fim:")
-fim_label.pack()
-entrada_fim = ctk.CTkEntry(janela, placeholder_text="AAAA-MM-DD")
-entrada_fim.pack()
+# Labels e inputs
+inicio_label = ctk.CTkLabel(frame_inputs, text="Data de Início:", anchor="w")
+inicio_label.pack(fill="x", anchor="w", pady=5, padx=20)
+entrada_inicio = ctk.CTkEntry(frame_inputs, placeholder_text="AAAA-MM-DD")
+entrada_inicio.pack(fill="x", pady=5, padx=20)
 
-ids_label = ctk.CTkLabel(janela, text="IDs das Empresas (separados por vírgula):")
-ids_label.pack()
-entrada_ids = ctk.CTkEntry(janela)
-entrada_ids.pack()
+fim_label = ctk.CTkLabel(frame_inputs, text="Data de Fim:", anchor="w")
+fim_label.pack(fill="x", anchor="w", padx=20)
+entrada_fim = ctk.CTkEntry(frame_inputs, placeholder_text="AAAA-MM-DD")
+entrada_fim.pack(fill="x", pady=5, padx=20)
 
-tipo_label = ctk.CTkLabel(janela, text="Tipo de Consulta:")
-tipo_label.pack()
-opcao_tipo = ctk.CTkComboBox(janela, values=["Campanha", "Gateway", "Healthscore"])
-opcao_tipo.pack()
+ids_label = ctk.CTkLabel(frame_inputs, text="IDs das Empresas:", anchor="w")
+ids_label.pack(fill="x", anchor="w", padx=20)
+entrada_ids = ctk.CTkEntry(frame_inputs, placeholder_text="separados por vírgula ex.: 48, 49, 50...")
+entrada_ids.pack(fill="x", pady=5, padx=20)
+
+tipo_label = ctk.CTkLabel(frame_inputs, text="Tipo de Consulta:", anchor="w")
+tipo_label.pack(fill="x", anchor="w", padx=20)
+opcao_tipo = ctk.CTkComboBox(frame_inputs, values=["Campanha", "Gateway", "Healthscore"])
+opcao_tipo.pack(fill="x", pady=5, padx=20)
 
 consultar_botao = ctk.CTkButton(janela, text="Exportar", command=processar_consulta)
 consultar_botao.pack(pady=10)
 
 resultado_label = ctk.CTkLabel(janela, text="")
-resultado_label.pack()
+resultado_label.pack(pady=5)
 
-# Executa a janela
+# Executar a janela
 janela.mainloop()
