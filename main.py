@@ -104,6 +104,8 @@ janela = ctk.CTk()
 janela.title("Exportar Dados")
 janela.geometry("400x600")
 
+janela.iconbitmap("icon.ico")
+
 # Exibir a imagem acima do título
 imagem = ctk.CTkImage(light_image=Image.open("logo.png"), size=(200, 100))
 imagem_label = ctk.CTkLabel(janela, image=imagem, text="")
