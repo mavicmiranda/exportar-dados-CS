@@ -8,10 +8,8 @@ from PIL import Image
 import os
 from dotenv import load_dotenv
 
-# Agora você pode acessar as variáveis de ambiente
 url_health = os.getenv("URL_HEALTH")
 url = os.getenv("WEBHOOK_URL")
-# Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
 
 
@@ -20,7 +18,6 @@ def processar_consulta():
     fim = entrada_fim.get()
     tipo_consulta = opcao_tipo.get()
 
-    # Usando as URLs carregadas das variáveis de ambiente
     url_health = os.getenv("URL_HEALTH")
     url = os.getenv("WEBHOOK_URL")
     
@@ -96,7 +93,6 @@ def processar_consulta():
         print(f"Erro ao processar os dados.")
         resultado_label.configure(text="Erro ao processar os dados.", text_color="red")
 
-# Configurações da janela principal
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -106,16 +102,13 @@ janela.geometry("400x600")
 
 janela.iconbitmap("icon.ico")
 
-# Exibir a imagem acima do título
 imagem = ctk.CTkImage(light_image=Image.open("logo.png"), size=(200, 100))
 imagem_label = ctk.CTkLabel(janela, image=imagem, text="")
 imagem_label.pack(pady=10, fill="x")
 
-# Frame para inputs
 frame_inputs = ctk.CTkFrame(janela)
 frame_inputs.pack(fill="both", expand=True, padx=20, pady=10)
 
-# Labels e inputs
 inicio_label = ctk.CTkLabel(frame_inputs, text="Data de Início:", anchor="w")
 inicio_label.pack(fill="x", anchor="w", pady=5, padx=20)
 entrada_inicio = ctk.CTkEntry(frame_inputs, placeholder_text="AAAA-MM-DD")
@@ -142,5 +135,4 @@ consultar_botao.pack(pady=10)
 resultado_label = ctk.CTkLabel(janela, text="")
 resultado_label.pack(pady=5)
 
-# Executar a janela
 janela.mainloop()
